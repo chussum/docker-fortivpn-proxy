@@ -1,0 +1,33 @@
+name: Release
+on:
+  push:
+    branches:
+      - master
+      - develop
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: chussum/fortivpn-proxy
+
+    steps:
+      - uses: actions/checkout@v3.5.0
+
+      - uses: docker/setup-qemu-action@v2.1.0
+        id: qemu
+        with:
+          platforms: arm64
+      - uses: docker/setup-buildx-action@v2.5.0
+
+      - name: Build and push
+        env:
+          REGISTRY: ghcr.io
+          USERNAME: ${{ github.actor }}
+          PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          docker login "$REGISTRY" -u "$USERNAME" --password-stdin <<< "$PASSWORD"
+          docker buildx build --platform="${{ steps.qemu.outputs.platforms }}" --push -t "$REGISTRY/$IMAGE_NAME:${{ github.ref_name }}" .
+          rm -rf ~/.docker
