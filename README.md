@@ -1,6 +1,6 @@
 # docker-fortivpn-proxy ![](https://https://github.com/chussum/docker-fortivpn-proxy/workflows/Build/badge.svg)
 
-Connect to a Fortinet SSL-VPN via http/socks5 proxy.
+Connect to a Fortinet SSL-VPN via socks5 proxy.
 
 ## Usage
 
@@ -10,33 +10,27 @@ NOTE: I only tested this image on macOS systems.
 
     ```
     $ cat /path/to/config
-    host = vpn.example.com
-    port = 443
-    username = foo
-    password = bar
-    trusted-cert = (optional)
+    OPENCONNECT_URL=[server ip]:[port]
+    OPENCONNECT_USER=foo
+    OPENCONNECT_PASSWORD=bar
+    OPENCONNECT_OPTIONS=--protocol=fortinet --servercert pin-sha256:~~~
     ```
 
 2. Run the following command to start the container.
 
     ```
-    $ docker container run \
-        --cap-add=NET_ADMIN \
-        --privileged \
-        --rm \
-        -v /path/to/config:/etc/openfortivpn/config:ro \
+    $ docker run -d \
+        --name fortinet-proxy \
+        --restart=on-failure:3 \
+        -p 1080:1080 \
+        -it \
+        --env-file=/path/to/config \
         ghcr.io/chussum/fortivpn-proxy:main
     ```
 
-3. Now you can use SSL-VPN via `http://<container-ip>:8443` or `socks5://<container-ip>:8443`.
-
-    ```
-    $ http_proxy=http://172.17.0.2:8443 curl http://example.com
-
-    $ ssh -o ProxyCommand="nc -x 172.17.0.2:8443 %h %p" foo@example.com
-    ```
+3. Now you can use SSL-VPN via `socks5://localhost:1080`.
 
 ## License
 MIT
 
-thx. https://github.com/Tosainu/docker-fortivpn-socks5
+thx. https://github.com/rankun203/openconnect-proxy

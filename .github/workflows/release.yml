@@ -16,10 +16,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3.5.0
 
-      - uses: docker/setup-qemu-action@v2.1.0
-        id: qemu
-        with:
-          platforms: arm64
       - uses: docker/setup-buildx-action@v2.5.0
 
       - name: Build and push
@@ -29,5 +25,5 @@ jobs:
           PASSWORD: ${{ secrets.GITHUB_TOKEN }}
         run: |
           docker login "$REGISTRY" -u "$USERNAME" --password-stdin <<< "$PASSWORD"
-          docker buildx build --platform="${{ steps.qemu.outputs.platforms }}" --push -t "$REGISTRY/$IMAGE_NAME:${{ github.ref_name }}" .
+          docker buildx build --platform=linux/amd64,linux/arm/v7,linux/arm64/v8 --push -t "$REGISTRY/$IMAGE_NAME:${{ github.ref_name }}" .
           rm -rf ~/.docker
