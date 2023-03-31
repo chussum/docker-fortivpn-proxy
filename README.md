@@ -19,11 +19,9 @@ NOTE: I only tested this image on macOS systems.
 2. Run the following command to start the container.
 
     ```
-    $ docker run -d \
-        --name fortinet-proxy \
-        --restart=on-failure:3 \
-        -p 1080:1080 \
+    $ docker run \
         -it \
+        -p 1080:1080 \
         --env-file=/path/to/config \
         ghcr.io/chussum/fortivpn-proxy:main
     ```
