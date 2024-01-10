@@ -13,6 +13,9 @@ run () {
   elif [[ ! -z "${OPENCONNECT_PASSWORD}" ]]; then
     # Standard authentication
     echo $OPENCONNECT_PASSWORD | openconnect -u "$OPENCONNECT_USER" --passwd-on-stdin --script-tun --script="ocproxy -g -D 1080" $OPENCONNECT_OPTIONS $OPENCONNECT_URL
+  elif [[ ! -z "${OPENCONNECT_MFA_CODE}" ]]; then
+  # Multi factor authentication (MFA)
+    echo $OPENCONNECT_MFA_CODE | openconnect -u "$OPENCONNECT_USER" $OPENCONNECT_OPTIONS --passwd-on-stdin $OPENCONNECT_URL
   fi
 }
 
